@@ -29,9 +29,6 @@ def _adapter_class():
   class Adapter(Stock):
     """evo-release 与 stock 0.11 的差异都写在这里。"""
 
-    # 本分支 scons 生成的是 warp_<w>x<h>_tinygrad.pkl（没有 driving_ 前缀）
-    WARP_NAME = 'warp_{cam_w}x{cam_h}_tinygrad.pkl'
-
     # 本分支多一个 selfdriveStateSP（MADS），判断"是否在控制中"要看它
     IN_CONTROL_SERVICES = ('carState', 'carControl', 'selfdriveState', 'selfdriveStateSP')
 
@@ -51,6 +48,20 @@ def _adapter_class():
       from pathlib import Path
       from openpilot.system.hardware.hw import Paths
       return Path(Paths.model_root())
+
+    def put(self, key, value, *, block=False):
+      """本分支 Params.put 没有 block 参数（stock 有）。"""
+      self._params().put(key, value)
+
+    def small_reset(self, small):
+      """本分支 ModelState 的历史：GPU 上的 img_queues + numpy 的 full_input_queues/numpy_inputs。"""
+      try:
+        from jetlink.openpilot.warp import reset_queues
+        queues = [q for q in small.img_queues.values() if getattr(q, 'device', 'NPY') != 'NPY']
+        arrays = list(small.numpy_inputs.values()) + list(small.full_input_queues.q.values())
+        return reset_queues(queues, arrays, small.prev_desire)
+      except Exception:
+        return None
 
     def engaged(self, sm) -> bool:
       """MADS 只开横向（ACC 未接管）也算在控制中，换模型时才不会被误判为未启用。"""
