@@ -35,6 +35,17 @@ def _adapter_class():
     # 本分支多一个 selfdriveStateSP（MADS），判断"是否在控制中"要看它
     IN_CONTROL_SERVICES = ('carState', 'carControl', 'selfdriveState', 'selfdriveStateSP')
 
+    # warp 在仓库根的 selfdrive/modeld/models（stock 在 openpilot/selfdrive/...）
+    WARP_DIR = 'selfdrive/modeld/models'
+
+    def camera(self):
+      """stock 从 openpilot.common.hardware 取设备类型；本分支在 openpilot.system.hardware。"""
+      from openpilot.system.hardware import HARDWARE
+      from openpilot.common.transformations.camera import _ar_ox_fisheye, _os_fisheye
+      from openpilot.common.transformations.model import MEDMODEL_INPUT_SIZE
+      camera = _os_fisheye if HARDWARE.get_device_type() == 'mici' else _ar_ox_fisheye
+      return camera.width, camera.height, *MEDMODEL_INPUT_SIZE
+
     def model_root(self):
       """本分支的 Paths 在 openpilot.system.hardware（stock 在 openpilot.common.hardware）。"""
       from pathlib import Path

@@ -20,6 +20,7 @@ from openpilot.common.swaglog import cloudlog
 from openpilot.common.params import Params
 from openpilot.common.filter_simple import FirstOrderFilter
 from openpilot.common.realtime import config_realtime_process, DT_MDL
+from openpilot import jetlink_adapter
 from openpilot.common.transformations.camera import DEVICE_CAMERAS
 from openpilot.system.camerad.cameras.nv12_info import get_nv12_info
 from openpilot.common.transformations.model import get_warp_matrix
@@ -243,15 +244,21 @@ class ModelState(ModelStateBase):
 def main(demo=False):
   cloudlog.warning("modeld init")
 
-  if not USBGPU:
-    # USB GPU currently saturates a core so can't do this yet,
-    # also need to move the aux USB interrupts for good timings
-    config_realtime_process(7, 54)
+  HOOKS = jetlink_adapter.hooks()
 
   st = time.monotonic()
   cloudlog.warning("loading model")
   model = ModelState()
+  small_model = model
   cloudlog.warning(f"models loaded in {time.monotonic() - st:.1f}s, modeld starting")
+
+  # jetlink：在进入实时线程前决定要不要接外部算力（大模型）
+  HOOKS.prepare(False)
+
+  if not USBGPU:
+    # USB GPU currently saturates a core so can't do this yet,
+    # also need to move the aux USB interrupts for good timings
+    config_realtime_process(7, 54)
 
   # visionipc clients
   while True:
@@ -273,6 +280,8 @@ def main(demo=False):
     time.sleep(0.1)
 
   cloudlog.warning(f"connected main cam with buffer size: {vipc_client_main.buffer_len} ({vipc_client_main.width} x {vipc_client_main.height})")
+  # jetlink：链路就绪则由外部算力接管推理（未就绪仍是小模型）
+  model = HOOKS.attach(model, small_model, vipc_client_main.width, vipc_client_main.height)
   if use_extra_client:
     cloudlog.warning(f"connected extra cam with buffer size: {vipc_client_extra.buffer_len} ({vipc_client_extra.width} x {vipc_client_extra.height})")
 
@@ -374,6 +383,10 @@ def main(demo=False):
     run_count = run_count + 1
 
     frame_drop_ratio = frames_dropped / (1 + frames_dropped)
+    try:
+      model.frame_drop_ratio = frame_drop_ratio
+    except Exception:
+      pass
     prepare_only = vipc_dropped_frames > 0
     if prepare_only:
       cloudlog.error(f"skipping model eval. Dropped {vipc_dropped_frames} frames")
@@ -386,9 +399,16 @@ def main(demo=False):
     }
 
     mt1 = time.perf_counter()
-    model_output = model.run(bufs, transforms, inputs, prepare_only)
+    if model is small_model:
+      model_output = model.run(bufs, transforms, inputs, prepare_only)
+    else:
+      model_output = model.run(bufs, transforms, inputs)
     mt2 = time.perf_counter()
     model_execution_time = mt2 - mt1
+
+    # jetlink：大模型交接后重置丢帧滤波的 warmup
+    if HOOKS.handed_over(model):
+      run_count = 0
 
     if model_output is not None:
       modelv2_send = messaging.new_message('modelV2')
