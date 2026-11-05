@@ -338,6 +338,14 @@ def hardware_thread(end_event, hw_queue) -> None:
     show_alert = (not onroad_conditions["device_temp_good"] or not startup_conditions["device_temp_engageable"]) and onroad_conditions["ignition"]
     set_offroad_alert_if_changed("Offroad_TemperatureTooHigh", show_alert, extra_text=extra_text)
 
+    # jetlink：用户开了链路但跑不起来时，在 offroad 页面说明原因
+    try:
+      from openpilot import jetlink_adapter as _jl
+      _jl_reason = _jl.hooks().reason()
+      set_offroad_alert_if_changed("Offroad_JetlinkUnavailable", _jl_reason is not None, extra_text=_jl_reason)
+    except Exception:
+      pass
+
     # Handle offroad/onroad transition
     should_start = all(onroad_conditions.values())
     if started_ts is None:

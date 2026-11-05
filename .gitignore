@@ -106,3 +106,4 @@ TASK.md
 !.idea/customTargets.xml
 !.idea/tools/*
 !.run/*
+/jetlink

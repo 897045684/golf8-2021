@@ -343,6 +343,9 @@ class SelfdriveD(CruiseHelper):
     num_events = len(self.events)
 
     not_running = {p.name for p in self.sm['managerState'].processes if not p.running and p.shouldBeRunning}
+    # jetlink owner 死了只是退回小模型，不该报警
+    from openpilot import jetlink_adapter as _jl
+    not_running -= {_jl.OWNER}
     if self.sm.recv_frame['managerState'] and len(not_running):
       if not_running != self.not_running_prev:
         cloudlog.event("process_not_running", not_running=not_running, error=True)

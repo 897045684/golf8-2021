@@ -67,7 +67,13 @@ function launch {
 
   # handle pythonpath
   ln -sfn $(pwd) /data/pythonpath
+  ln -sfn jetlink_repo/jetlink jetlink
   export PYTHONPATH="$PWD"
+
+  # jetlink: 链路开启时接管 USB-C 口（仅 AGNOS）
+  if [ -f /AGNOS ] && [ -x jetlink/comma/jetlink-root.sh ]; then
+    sudo -n bash jetlink/comma/jetlink-root.sh boot /data/params/d/JetlinkLink &
+  fi
 
   # hardware specific init
   if [ -f /AGNOS ]; then
