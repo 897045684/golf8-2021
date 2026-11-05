@@ -150,16 +150,20 @@ def font_for_text(font: rl.Font, text: str) -> rl.Font:
   这样 "km/h"、"72" 这类文本的度量与设计完全一致，不会因为字体替换而错位。
   其他大字符集语言（th/ko/ja）仍整体回退到 unifont。"""
   if multilang.requires_cjk_font():
-    return gui_app.font(gui_app.weight_of(font)) if _has_cjk(text) else font
+    if not _has_cjk(text):
+      return font
+    weight = CJK_ALIAS.get(gui_app.weight_of(font), FontWeight.CJK_REGULAR)
+    return gui_app.font(weight)
   if multilang.requires_unifont():
     return gui_app.font(FontWeight.UNIFONT)
   return font
 
 
 def font_fallback(font: rl.Font) -> rl.Font:
-  """兼容旧调用点：不知道文本时按中文整体映射。"""
+  """兼容旧调用点：不知道文本时按中文整体映射到 CJK。"""
   if multilang.requires_cjk_font():
-    return gui_app.font(gui_app.weight_of(font))
+    weight = CJK_ALIAS.get(gui_app.weight_of(font), FontWeight.CJK_REGULAR)
+    return gui_app.font(weight)
   if multilang.requires_unifont():
     return gui_app.font(FontWeight.UNIFONT)
   return font

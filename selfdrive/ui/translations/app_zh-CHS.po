@@ -177,7 +177,7 @@ msgstr "始终启用驾驶员监控"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:33
 msgid "Any fast phone or laptop charger should be fine."
-msgstr "任何手机或笔记本快充充电器都可以。"
+msgstr "任何快充的手机或笔记本充电器都可以。"
 
 #: selfdrive/ui/sunnypilot/layouts/settings/sunnylink.py:226
 #, python-format
@@ -829,7 +829,7 @@ msgstr "分心程度过高"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:32
 msgid "Do all of my segments get pulled in Firehose Mode?"
-msgstr "Firehose 模式会拉取我的所有片段吗？"
+msgstr "数据洪流模式会拉取我的所有片段吗？"
 
 #: literal
 msgid "Do you want to upload driver camera data?"
@@ -837,11 +837,11 @@ msgstr "是否上传驾驶员摄像头数据？"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:31
 msgid "Does it matter how or where I drive?"
-msgstr "我的驾驶方式和地点有影响吗？"
+msgstr "我该怎么开、在哪开，有讲究吗？"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:34
 msgid "Does it matter which software I run?"
-msgstr "我运行的软件类型有影响吗？"
+msgstr "用哪个软件有影响吗？"
 
 #: selfdrive/ui/sunnypilot/layouts/settings/device.py:112
 #: selfdrive/ui/sunnypilot/layouts/settings/sunnylink.py:339
@@ -1245,6 +1245,16 @@ msgstr "按照提示完成配对流程"
 msgid "For applicable vehicles, always display the true vehicle current speed from wheel speed sensors."
 msgstr "对于适用的车型，始终显示来自轮速传感器的真实车辆当前速度。"
 
+#: manual
+msgid ""
+"For maximum effectiveness, bring your device inside and connect to a good USB-C adapter and Wi-Fi weekly.\n"
+"\n"
+"Firehose Mode can also work while you're driving if connected to a hotspot or unlimited SIM card."
+msgstr ""
+"为达到最佳效果，请每周把设备拿进室内，接上靠谱的 USB-C 电源并连上 Wi-Fi。\n"
+"\n"
+"如果连着热点或不限量 SIM 卡，行车途中也可以使用数据洪流模式。"
+
 #: selfdrive/ui/sunnypilot/layouts/settings/sunnylink.py:42
 #, python-format
 msgid "For secure backup, restore, and remote configuration"
@@ -1611,7 +1621,7 @@ msgstr "未选择车型"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:32
 msgid "No, we selectively pull a subset of your segments."
-msgstr "不会，我们只选择性拉取您的部分片段。"
+msgstr "不会，我们只挑选其中一部分片段。"
 
 #: selfdrive/ui/sunnypilot/layouts/settings/cruise_sub_layouts/speed_limit_settings.py:23
 #, python-format
@@ -1625,7 +1635,7 @@ msgstr "无：无偏移"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:31
 msgid "Nope, just drive as you normally would."
-msgstr "没有，按您平时的方式驾驶即可。"
+msgstr "没有，照你平时的方式开就行。"
 
 #: selfdrive/ui/sunnypilot/layouts/settings/sunnylink.py:351
 #: selfdrive/ui/sunnypilot/layouts/settings/sunnylink.py:172
@@ -2925,7 +2935,7 @@ msgstr "欢迎使用 sunnypilot"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:33
 msgid "What's a good USB-C adapter?"
-msgstr "推荐使用哪种 USB-C 适配器？"
+msgstr "什么样的 USB-C 电源合适？"
 
 #: selfdrive/ui/sunnypilot/layouts/settings/software.py:22
 msgid "When enabled, automatic software updates will be off.<br><b>This requires a reboot to take effect.</b>"
@@ -2976,7 +2986,7 @@ msgstr "是，删除所有地图"
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:34
 msgid "Yes, only upstream openpilot (and particular forks) are able to be used for training."
-msgstr "有影响，只有上游 openpilot（及特定分支）可用于训练。"
+msgstr "有影响，只有上游 openpilot（以及部分特定的分支）会用于训练。"
 
 #: selfdrive/ui/layouts/onboarding.py:152
 #, python-format
@@ -3149,7 +3159,7 @@ msgstr "正在完成更新..."
 
 #: literal
 msgid "firehose"
-msgstr "刷机模式"
+msgstr "数据洪流"
 
 #: system/ui/widgets/network.py:247
 #: system/ui/widgets/network.py:328
@@ -3406,6 +3416,16 @@ msgstr "你的车型必须支持并已启用 sunnypilot 纵向控制才能使用
 msgid "sunnypilot Unavailable"
 msgstr "sunnypilot 不可用"
 
+#: manual
+msgid ""
+"sunnypilot learns to drive by watching humans, like you, drive.\n"
+"\n"
+"Firehose Mode allows you to maximize your training data uploads to improve openpilot's driving models. More data means bigger models, which means better Experimental Mode."
+msgstr ""
+"sunnypilot 通过观察你这样的真人驾驶来学习。\n"
+"\n"
+"数据洪流模式会让你尽可能多地上传训练数据，用来改进 openpilot 的驾驶模型。数据越多，模型越大，实验模式也就越好用。"
+
 #: selfdrive/ui/layouts/settings/toggles.py:187
 #, python-format
 msgid "sunnypilot longitudinal control may come in a future update."
@@ -3498,25 +3518,25 @@ msgstr "Wi-Fi"
 #, python-format
 msgid "{} ALERT"
 msgid_plural "{} ALERTS"
-msgstr[0] "{} 条提示"
+msgstr[0] ""
 
 #: selfdrive/ui/layouts/settings/software.py:50
 #, python-format
 msgid "{} day ago"
 msgid_plural "{} days ago"
-msgstr[0] "{} 天前"
+msgstr[0] ""
 
 #: selfdrive/ui/layouts/settings/software.py:47
 #, python-format
 msgid "{} hour ago"
 msgid_plural "{} hours ago"
-msgstr[0] "{} 小时前"
+msgstr[0] ""
 
 #: selfdrive/ui/layouts/settings/software.py:44
 #, python-format
 msgid "{} minute ago"
 msgid_plural "{} minutes ago"
-msgstr[0] "{} 分钟前"
+msgstr[0] ""
 
 #: selfdrive/ui/mici/layouts/settings/firehose.py:113
 #: selfdrive/ui/mici/layouts/settings/firehose.py:164
@@ -3524,7 +3544,7 @@ msgstr[0] "{} 分钟前"
 #, python-format
 msgid "{} segment of your driving is in the training dataset so far."
 msgid_plural "{} segments of your driving is in the training dataset so far."
-msgstr[0] "目前为止，你的行驶已有 {} 个片段存入训练数据集。"
+msgstr[0] ""
 
 #: selfdrive/ui/widgets/prime.py:62
 #, python-format
