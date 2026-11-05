@@ -136,8 +136,28 @@ CJK_ALIAS = {
 }
 
 
+def _has_cjk(text: str) -> bool:
+  for ch in text:
+    o = ord(ch)
+    if 0x3040 <= o <= 0x9fff or 0xf900 <= o <= 0xfaff or 0x3000 <= o <= 0x303f or 0xff00 <= o <= 0xff60:
+      return True
+  return False
+
+
+def font_for_text(font: rl.Font, text: str) -> rl.Font:
+  """中文界面：文本含 CJK 才用 CJK 图集，纯拉丁（数字/单位/英文）保持原字体。
+
+  这样 "km/h"、"72" 这类文本的度量与设计完全一致，不会因为字体替换而错位。
+  其他大字符集语言（th/ko/ja）仍整体回退到 unifont。"""
+  if multilang.requires_cjk_font():
+    return gui_app.font(gui_app.weight_of(font)) if _has_cjk(text) else font
+  if multilang.requires_unifont():
+    return gui_app.font(FontWeight.UNIFONT)
+  return font
+
+
 def font_fallback(font: rl.Font) -> rl.Font:
-  """中文界面按字重映射到对应的 CJK 字体；其他大字符集语言回退到 unifont。"""
+  """兼容旧调用点：不知道文本时按中文整体映射。"""
   if multilang.requires_cjk_font():
     return gui_app.font(gui_app.weight_of(font))
   if multilang.requires_unifont():
@@ -675,8 +695,6 @@ class GuiApplication(GuiApplicationExt):
       pass
 
   def font(self, font_weight: FontWeight = FontWeight.NORMAL) -> rl.Font:
-    if multilang.requires_cjk_font():
-      font_weight = CJK_ALIAS.get(font_weight, FontWeight.CJK_REGULAR)
     return self._fonts[font_weight]
 
   def weight_of(self, font: rl.Font) -> FontWeight:
@@ -695,8 +713,7 @@ class GuiApplication(GuiApplicationExt):
     # 中文界面只需要 CJK 图集 + unifont，跳过整套拉丁字体以省显存
     use_cjk = multilang.requires_cjk_font()
     for font_weight_file in FontWeight:
-      if use_cjk and font_weight_file in LATIN_FONTS:
-        continue
+      # 中文模式：CJK 与拉丁字体都加载，按文本内容选择（纯拉丁文本保持 Inter 度量）
       if (not use_cjk) and font_weight_file in CJK_FONTS:
         continue
       with as_file(FONT_DIR) as fspath:
@@ -721,7 +738,7 @@ class GuiApplication(GuiApplicationExt):
       rl._orig_draw_text_ex = rl.draw_text_ex
 
     def _draw_text_ex_scaled(font, text, position, font_size, spacing, tint):
-      font = font_fallback(font)
+      font = font_for_text(font, text)
       return rl._orig_draw_text_ex(font, text, position, font_size * FONT_SCALE, spacing, tint)
 
     rl.draw_text_ex = _draw_text_ex_scaled
