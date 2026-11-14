@@ -118,6 +118,23 @@ def hooks():
     return Off(str(e), link_on=link_on)
 
 
+def status_summary() -> str:
+  """给 UI 用的一句话状态（英文，由 UI 层翻译）。"""
+  try:
+    s = hooks().status()
+  except Exception:
+    return 'error'
+  if s is None or not s.enabled:
+    return 'off'
+  if s.reason:
+    return str(s.reason)[:48]
+  if s.ready:
+    return f'ready · {s.model}' if s.model else 'ready'
+  if s.present:
+    return 'connected'
+  return 'waiting'
+
+
 def should_run(started, params, CP) -> bool:
   return hooks().should_run(started, params, CP)
 

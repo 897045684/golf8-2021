@@ -30,6 +30,14 @@ DESCRIPTIONS = {
 }
 
 
+def _jetlink_text() -> str:
+  try:
+    from openpilot import jetlink_adapter as ja
+    return ja.status_summary()
+  except Exception:
+    return "unavailable"
+
+
 class DeviceLayout(Widget):
   def __init__(self):
     super().__init__()
@@ -67,6 +75,8 @@ class DeviceLayout(Widget):
                   self._on_review_training_guide, enabled=ui_state.is_offroad),
       button_item(lambda: tr("Regulatory"), lambda: tr("VIEW"), callback=self._on_regulatory, enabled=ui_state.is_offroad),
       button_item(lambda: tr("Change Language"), lambda: tr("CHANGE"), callback=self._show_language_dialog),
+      text_item(lambda: "Jetlink", lambda: _jetlink_text(),
+                lambda: tr("External compute link (zoom pilot) for the large driving model")),
       self._power_off_btn,
     ]
     return items
