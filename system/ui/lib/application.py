@@ -715,11 +715,8 @@ class GuiApplication(GuiApplicationExt):
 
   def _load_fonts(self):
     # 中文界面只需要 CJK 图集 + unifont，跳过整套拉丁字体以省显存
-    use_cjk = multilang.requires_cjk_font()
     for font_weight_file in FontWeight:
-      # 中文模式：CJK 与拉丁字体都加载，按文本内容选择（纯拉丁文本保持 Inter 度量）
-      if (not use_cjk) and font_weight_file in CJK_FONTS:
-        continue
+      # CJK 与拉丁字体始终都加载：切换语言后无需重启也能正常渲染
       with as_file(FONT_DIR) as fspath:
         fnt_path = fspath / font_weight_file
         font = rl.load_font(fnt_path.as_posix())

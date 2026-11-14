@@ -86,6 +86,9 @@ class DeviceLayout(Widget):
         selected_language = multilang.languages[self._select_language_dialog.selection]
         multilang.change_language(selected_language)
         self._update_calib_description()
+        # 模块级 tr_noop 常量在导入时求值，切换语言需要重启 UI（manager 会自动拉起）
+        import os as _os, signal as _signal
+        _os.kill(_os.getpid(), _signal.SIGTERM)
       self._select_language_dialog = None
 
     self._select_language_dialog = MultiOptionDialog(tr("Select a language"), multilang.languages, multilang.codes[multilang.language],
