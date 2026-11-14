@@ -22,6 +22,41 @@ from openpilot.system.ui.widgets.html_render import HtmlModal, HtmlRenderer
 from openpilot.system.athena.registration import UNREGISTERED_DONGLE_ID
 
 
+_JL_HOOKS = None
+
+
+def _jetlink_hooks():
+  """jetlink 的 hooks 单例；没装 jetlink 时返回 None。"""
+  global _JL_HOOKS
+  if _JL_HOOKS is None:
+    try:
+      from openpilot import jetlink_adapter as ja
+      _JL_HOOKS = ja.hooks()
+    except Exception:
+      _JL_HOOKS = False
+  return _JL_HOOKS or None
+
+
+def jetlink_status_text() -> str:
+  """设置页显示的一行状态：off / waiting / connected / ready · 模型名 / 不可用原因。"""
+  hooks = _jetlink_hooks()
+  if hooks is None:
+    return tr("unavailable")
+  try:
+    s = hooks.status()
+  except Exception:
+    return tr("error")
+  if s is None or not s.enabled:
+    return tr("off")
+  if s.reason:
+    return str(s.reason)[:48]
+  if s.ready:
+    return f"{tr('ready')} · {s.model}" if s.model else tr("ready")
+  if s.present:
+    return tr("connected")
+  return tr("waiting")
+
+
 class MiciFccModal(NavRawScrollPanel):
   def __init__(self, file_path: str | None = None, text: str | None = None):
     super().__init__()
@@ -310,6 +345,9 @@ class DeviceLayoutMici(NavScroller):
     driver_cam_btn.set_click_callback(lambda: gui_app.push_widget(DriverCameraDialog()))
     driver_cam_btn.set_enabled(lambda: ui_state.is_offroad())
 
+    jetlink_btn = BigButton("jetlink", lambda: jetlink_status_text(), "icons_mici/settings/device/info.png")
+    jetlink_btn.set_enabled(lambda: False)
+
     review_training_guide_btn = BigButton("review\ntraining guide", "", "icons_mici/settings/device/info.png")
     review_training_guide_btn.set_click_callback(lambda: gui_app.push_widget(TrainingGuide(completed_callback=gui_app.pop_widget)))
     review_training_guide_btn.set_enabled(lambda: ui_state.is_offroad())
@@ -322,6 +360,7 @@ class DeviceLayoutMici(NavScroller):
       DeviceInfoLayoutMici(),
       UpdateOpenpilotBigButton(),
       PairBigButton(),
+      jetlink_btn,
       review_training_guide_btn,
       driver_cam_btn,
       terms_btn,
