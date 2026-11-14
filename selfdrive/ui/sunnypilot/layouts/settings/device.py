@@ -34,6 +34,14 @@ offroad_time_options = {
 }
 
 
+def _jetlink_text() -> str:
+  try:
+    from openpilot import jetlink_adapter as ja
+    return ja.status_summary()
+  except Exception:
+    return "unavailable"
+
+
 class DeviceLayoutSP(DeviceLayout):
   def __init__(self):
     DeviceLayout.__init__(self)
@@ -112,6 +120,8 @@ class DeviceLayoutSP(DeviceLayout):
       text_item(lambda: tr("Dongle ID"), self._params.get("DongleId") or (lambda: tr("N/A"))),
       LineSeparator(),
       text_item(lambda: tr("Serial"), self._params.get("HardwareSerial") or (lambda: tr("N/A"))),
+      LineSeparator(),
+      text_item(lambda: "Jetlink", lambda: _jetlink_text()),
       LineSeparator(),
       self._pair_device_btn,
       LineSeparator(),
