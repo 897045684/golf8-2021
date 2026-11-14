@@ -129,7 +129,7 @@ def status_summary() -> str:
   if s.reason:
     return str(s.reason)[:48]
   if s.ready:
-    return f'ready · {s.model}' if s.model else 'ready'
+    return f'ready - {s.model}' if s.model else 'ready'
   if s.present:
     return 'connected'
   return 'waiting'

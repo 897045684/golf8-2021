@@ -14,6 +14,8 @@ EXTRA_CHARS = "–‑✓×°§•X⚙✕◀▶✔⌫⇧␣○●↳çêüñ–�
 UNIFONT_LANGUAGES = {"th", "zh-CHT", "zh-CHS", "ko", "ja"}
 CJK_LANGUAGES = ("zh-CHS", "zh-CHT")
 CJK_FONT_SIZE = 72  # 中文位图字体基准字号，raylib 用 lineHeight 作为 baseSize
+# 常用中文/排版标点：po 里没出现但 UI 代码里会用到
+CJK_EXTRA_PUNCT = "·—…‰′″“”‘’《》【】〖〗～×÷≥≤±°※§¶†‡•→←↑↓"
 
 
 def _languages():
@@ -42,6 +44,7 @@ def _char_sets():
 def _cjk_char_sets():
   """中文位图字体只打包 ASCII + 标点 + 中文（简/繁）翻译里用到的字形。"""
   chars = set(map(chr, range(32, 127))) | set(EXTRA_CHARS)
+  chars.update(CJK_EXTRA_PUNCT)
   for language in _languages():
     chars.update(language)
   for code in CJK_LANGUAGES:
